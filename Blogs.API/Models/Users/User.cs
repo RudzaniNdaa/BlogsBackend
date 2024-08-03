@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Blogs.API.Models.Authors;
 using Microsoft.AspNetCore.Identity;
 
 namespace Blogs.API.Models.Users
@@ -31,5 +32,7 @@ namespace Blogs.API.Models.Users
         public UserStatus Status { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset UpdatedDate { get; set; }
+
+        public IEnumerable<Author> Authors { get; set; }
     }
 }
