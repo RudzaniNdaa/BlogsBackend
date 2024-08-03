@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Blogs.API.Models.Comments;
+using Blogs.API.Models.Likes;
 using Blogs.API.Models.Posts;
 
 namespace Blogs.API.Models.Authors
@@ -18,5 +19,6 @@ namespace Blogs.API.Models.Authors
 
         public IEnumerable<Post> Posts { get; set; }
         public IEnumerable<Comment> Comments { get; set; }
+        public IEnumerable<Like> Likes { get; set; }
     }
 }
