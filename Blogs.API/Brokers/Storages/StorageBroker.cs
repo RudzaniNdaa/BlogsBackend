@@ -18,6 +18,35 @@ namespace Blogs.API.Brokers.Storages
             this.Database.Migrate();
         }
 
+        private async ValueTask<T> InsertAsync<T>(T @object)
+        {
+            await this.AddAsync(@object);
+            await this.SaveChangesAsync();
+
+            return @object;
+        }
+
+        private IQueryable<T> SelectAll<T>() where T : class => this.Set<T>();
+
+        private async ValueTask<T> SelectAsync<T>(params object[] @objectIds) where T : class =>
+            await this.FindAsync<T>(objectIds);
+
+        private async ValueTask<T> UpdateAsync<T>(T @object) where T : class
+        {
+            await this.UpdateAsync(@object);
+            await this.SaveChangesAsync();
+
+            return @object;
+        }
+
+        private async ValueTask<T> DeleteAsync<T>(T @object) where T : class
+        {
+            this.Remove(@object);
+            await this.SaveChangesAsync();
+
+            return @object;
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             string connectionString =
