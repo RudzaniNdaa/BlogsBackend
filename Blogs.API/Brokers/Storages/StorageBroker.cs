@@ -64,6 +64,7 @@ namespace Blogs.API.Brokers.Storages
             SetLikeConfigurations(modelBuilder);
             SetPostAttachmentConfigurations(modelBuilder);
             SetPostConfigurations(modelBuilder);
+            SetReplyConfigurations(modelBuilder);
         }
     }
 }
