@@ -5,6 +5,7 @@ using Blogs.API.Brokers.UserManagements;
 using Blogs.API.Models.Users;
 using Blogs.API.Services.Foundations.Authors;
 using Blogs.API.Services.Foundations.Comments;
+using Blogs.API.Services.Foundations.Likes;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +29,7 @@ builder.Services.AddTransient<IDateTimeBroker, DateTimeBroker>();
 
 builder.Services.AddTransient<IAuthorService, AuthorService>();
 builder.Services.AddTransient<ICommentService, CommentService>();
+builder.Services.AddTransient<ILikeService, LikeService>();
 
 var app = builder.Build();
 
