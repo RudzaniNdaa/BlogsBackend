@@ -61,6 +61,7 @@ namespace Blogs.API.Brokers.Storages
             base.OnModelCreating(modelBuilder);
             SetAuthorComfigurations(modelBuilder);
             SetCommentConfigurations(modelBuilder);
+            SetLikeConfigurations(modelBuilder);
         }
     }
 }
