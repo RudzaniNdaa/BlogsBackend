@@ -59,6 +59,7 @@ namespace Blogs.API.Brokers.Storages
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            SetAuthorComfigurations(modelBuilder);
         }
     }
 }
