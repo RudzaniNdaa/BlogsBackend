@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Blogs.API.Models.Users
 {
-    public class Role : IdentityRole<Guid>
+    public class UserRole : IdentityUserRole<Guid>
     {
-        public virtual ICollection<Role> Roles { get; set; }
-        public virtual ICollection<User> User { get; set; }
+        public virtual User User { get; set; }
+        public virtual Role Role { get; set; }
     }
 }
