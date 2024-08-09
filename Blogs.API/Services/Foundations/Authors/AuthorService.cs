@@ -6,7 +6,9 @@ using Blogs.API.Brokers.DateTimes;
 using Blogs.API.Brokers.Loggings;
 using Blogs.API.Brokers.Storages;
 using Blogs.API.Models.Authors;
+using Blogs.API.Models.Authors.Exceptions;
 using Blogs.API.Models.Configurations.Retries;
+using Blogs.API.Models.Configurations.TryCatches;
 
 namespace Blogs.API.Services.Foundations.Authors
 {
@@ -30,29 +32,71 @@ namespace Blogs.API.Services.Foundations.Authors
 
         }
 
-        public async ValueTask<Author> AddAuthorAsync(Author author)
-        {
-            return await this.storageBroker.InsertAuthorAsync(author);
-        }
+        public ValueTask<Author> AddAuthorAsync(Author author) =>
+            TryCatch(new Operation<ValueTask<Author>>
+            {
+                Execution = async () =>
+                {
+                    ValidateAuthorOnAdd(author);
 
-        public IQueryable<Author> RetrieveAllAuthors()
-        {
-            return this.storageBroker.SelectAllAuthors();
-        }
+                    return await this.storageBroker.InsertAuthorAsync(author);
+                },
+                WithTracing = new 
+                {
+                    ActivityName = nameof(this.AddAuthorAsync),
+                    Tags = new Dictionary<string, string> { {"AuthorID", author?.ID.ToString()}},
+                    Baggage = new Dictionary<string, string> { {"AuthorID", author?.ID.ToString()}},
+                },
+                WithSecurityRoles = new List<string>() { "Administrators", "Users" },
+                WithRetryOn = new List<Type>() { typeof(TimeoutException) },
+                WithRollbackOn = new List<Type>() { typeof(AuthorDependencyValidationException) }
+            });
+        
 
-        public async ValueTask<Author> RetrieveAuthorByIdAsync(Guid authorId)
-        {
-            return await this.storageBroker.SelectAuthorByIdAsync(authorId);
-        }
+        public IQueryable<Author> RetrieveAllAuthors() =>
+            TryCatch(() => this.storageBroker.SelectAllAuthors());
+        
+        public ValueTask<Author> RetrieveAuthorByIdAsync(Guid authorId) =>
+            TryCatch(async () => 
+            {
+                ValidateAuthorId(authorId);
 
-        public async ValueTask<Author> ModifyAuthorAsync(Author author)
-        {
-            return await this.storageBroker.UpdateAuthorAsync(author);
-        }
+                Author maybeAuthor =
+                    await this.storageBroker.SelectAuthorByIdAsync(authorId);
 
-        public async ValueTask<Author> RemoveAuthorAsync(Author author)
-        {
-            return await this.storageBroker.DeleteAuthorAsync(author);
-        }
+                ValidateStorageAuthor(maybeAuthor, authorId);
+
+                return maybeAuthor;
+            });
+
+
+        public ValueTask<Author> ModifyAuthorAsync(Author author) =>
+            TryCatch(new Operation<ValueTask<Author>>
+            {
+                Execution = async () =>
+                {
+                    ValidateAuthorOnModify(author);
+
+                    return await this.storageBroker.UpdateAuthorAsync(author);
+                },
+                WithTracing = new 
+                {
+                    ActivityName = nameof(this.ModifyAuthorAsync),
+                    Tags = new Dictionary<string, string> { {"AuthorID", author?.ID.ToString()}},
+                    Baggage = new Dictionary<string, string> { {"AuthorID", author?.ID.ToString()}},
+                },
+                WithSecurityRoles = new List<string>() { "Administrators", "Users" },
+                WithRetryOn = new List<Type>() { typeof(TimeoutException) },
+                WithRollbackOn = new List<Type>() { typeof(AuthorDependencyValidationException) }
+            });
+
+        public ValueTask<Author> RemoveAuthorAsync(Author author) =>
+            TryCatch(async () => 
+            {
+                ValidateAuthorIsNotNull(author);
+                
+                return await this.storageBroker.DeleteAuthorAsync(author);
+            });
+        
     }
 }
